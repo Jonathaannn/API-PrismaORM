@@ -13,7 +13,7 @@ const createPost = async (req, res) => {
   if (!emailExist) {
     return res
       .status(404)
-      .json({ Error: "Email fornecido não pertence a nenhum Usuário!" });
+      .json({ Warning: "Email fornecido não pertence a nenhum Usuário!" });
   }
   try {
     await prisma.user.update({
@@ -48,7 +48,7 @@ const readPostsByUser = async (req, res) => {
   if (!IdExist) {
     return res
       .status(404)
-      .json({ Error: "ID fornecido não pertence a nenhum Usuário!" });
+      .json({ Warning: "ID fornecido não pertence a nenhum Usuário!" });
   }
   try {
     const data = await prisma.post.findMany({ where: { authorId: idAuth } });
@@ -74,7 +74,7 @@ const findPostById = async (req, res) => {
   if (!IdExist) {
     return res
       .status(404)
-      .json({ Error: "ID fornecido não pertence a nenhum Post!" });
+      .json({ Warning: "ID fornecido não pertence a nenhum Post!" });
   }
   try {
     const data = await prisma.post.findUnique({ where: { id: idPost } });
@@ -100,7 +100,7 @@ const updatePost = async (req, res) => {
   if (!IdExist) {
     return res
       .status(404)
-      .json({ Error: "ID fornecido não pertence a nenhum Post!" });
+      .json({ Warning: "ID fornecido não pertence a nenhum Post!" });
   }
   const { title, content } = req.body;
   if (!title || !content) {
@@ -130,7 +130,7 @@ const deletePost = async (req, res) => {
   if (!IdExist) {
     return res
       .status(404)
-      .json({ Error: "ID fornecido não pertence a nenhum Post!" });
+      .json({ Warning: "ID fornecido não pertence a nenhum Post!" });
   }
   try {
     await prisma.post.delete({ where: { id: idPost } });
@@ -151,7 +151,7 @@ const deleteAllPostsByUser = async (req, res) => {
   if (!IdExist) {
     return res
       .status(404)
-      .json({ Error: "ID fornecido não pertence a nenhum Usuário!" });
+      .json({ Warning: "ID fornecido não pertence a nenhum Usuário!" });
   }
   try {
     await prisma.post.deleteMany({ where: { authorId: idAuth } });

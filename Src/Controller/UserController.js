@@ -9,6 +9,10 @@ const createUser = async (req, res) => {
       .status(400)
       .json({ Error: "Preencha todos os campos corretamente!" });
   }
+  const emailExist = services.checkEmailUser(email);
+  if (emailExist) {
+    return res.status(400).json({ Warning: "Email já foi cadastrado!" });
+  }
   try {
     await prisma.user.create({ data: { name: name, email: email } });
     res.status(201).json({ Message: "Usuário criado com sucesso!" });
@@ -41,7 +45,7 @@ const findUserById = async (req, res) => {
   if (!idExist) {
     return res
       .status(404)
-      .json({ Error: "ID fornecido não pertence a nenhum Usuário!" });
+      .json({ Warning: "ID fornecido não pertence a nenhum Usuário!" });
   }
   try {
     const data = await prisma.user.findUnique({
@@ -71,7 +75,7 @@ const updateUser = async (req, res) => {
   if (!idExist) {
     return res
       .status(404)
-      .json({ Error: "ID fornecido não pertence a nenhum Usuário!" });
+      .json({ Warning: "ID fornecido não pertence a nenhum Usuário!" });
   }
   try {
     await prisma.user.update({
@@ -95,7 +99,7 @@ const deleteUser = async (req, res) => {
   if (!idExist) {
     return res
       .status(404)
-      .json({ Error: "ID fornecido não pertence a nenhum Usuário!" });
+      .json({ Warning: "ID fornecido não pertence a nenhum Usuário!" });
   }
   try {
     await prisma.user.delete({ where: { id: idUser } });

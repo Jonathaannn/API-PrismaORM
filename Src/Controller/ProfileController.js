@@ -13,7 +13,7 @@ const createProfile = async (req, res) => {
   if (!emailExist) {
     return res
       .status(404)
-      .json({ Error: "Email fornecido não pertence a nenhum Usuário!" });
+      .json({ Warning: "Email fornecido não pertence a nenhum Usuário!" });
   }
   try {
     const dataUser = await prisma.user.findUnique({
@@ -53,7 +53,7 @@ const updateProfile = async (req, res) => {
   if (!emailExist) {
     return res
       .status(404)
-      .json({ Error: "Email fornecido não pertence a nenhum Usuário!" });
+      .json({ Warning: "Email fornecido não pertence a nenhum Usuário!" });
   }
   try {
     await prisma.user.update({
@@ -81,7 +81,7 @@ const deleteProfile = async (req, res) => {
   if (!emailExist) {
     return res
       .status(404)
-      .json({ Error: "Email fornecido não pertence a nenhum Usuário!" });
+      .json({ Warning: "Email fornecido não pertence a nenhum Usuário!" });
   }
   try {
     await prisma.user.update({
