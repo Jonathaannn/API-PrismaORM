@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const services = require("../Services/Index");
 
 const createUser = async (req, res) => {
   const { name, email } = req.body;
@@ -18,7 +19,7 @@ const createUser = async (req, res) => {
   }
 };
 
-const readUser = async (req, res) => {
+const readUsers = async (req, res) => {
   try {
     const data = await prisma.user.findMany({
       include: { posts: true, profile: true },
@@ -36,14 +37,17 @@ const findUserById = async (req, res) => {
   if (!idUser) {
     return res.status(400).json({ Error: "ID fornecido não é válido!" });
   }
+  const idExist = services.checkIdUser(idUser);
+  if (!idExist) {
+    return res
+      .status(404)
+      .json({ Error: "ID fornecido não pertence a nenhum Usuário!" });
+  }
   try {
     const data = await prisma.user.findUnique({
       where: { id: idUser },
       include: { posts: true, profile: true },
     });
-    if (data === undefined) {
-      return res.status(404).json({ Error: "Usuário não encontrado!" });
-    }
     return res.status(200).json(data);
   } catch (error) {
     await prisma.$disconnect();
@@ -63,6 +67,12 @@ const updateUser = async (req, res) => {
   if (!idUser) {
     return res.status(400).json({ Error: "ID fornecido não é válido!" });
   }
+  const idExist = services.checkIdUser(idUser);
+  if (!idExist) {
+    return res
+      .status(404)
+      .json({ Error: "ID fornecido não pertence a nenhum Usuário!" });
+  }
   try {
     await prisma.user.update({
       where: { id: idUser },
@@ -81,6 +91,12 @@ const deleteUser = async (req, res) => {
   if (!idUser) {
     return res.status(400).json({ Error: "ID fornecido não é válido!" });
   }
+  const idExist = services.checkIdUser(idUser);
+  if (!idExist) {
+    return res
+      .status(404)
+      .json({ Error: "ID fornecido não pertence a nenhum Usuário!" });
+  }
   try {
     await prisma.user.delete({ where: { id: idUser } });
     return res.status(201).json({ Mssage: "Usuário deletado com sucesso!" });
@@ -91,4 +107,10 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { createUser, readUser, findUserById, updateUser, deleteUser };
+module.exports = {
+  createUser,
+  readUsers,
+  findUserById,
+  updateUser,
+  deleteUser,
+};
