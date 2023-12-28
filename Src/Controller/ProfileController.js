@@ -9,7 +9,7 @@ const createProfile = async (req, res) => {
       .status(400)
       .json({ Error: "Preencha todos os campos corretamente!" });
   }
-  const emailExist = services.checkEmailUser(email);
+  const emailExist = await services.checkEmailUser(email);
   if (!emailExist) {
     return res
       .status(404)
@@ -20,19 +20,18 @@ const createProfile = async (req, res) => {
       where: { email: email },
       include: { profile },
     });
-    if (dataUser.profile === null) {
+    if (!dataUser.profile) {
       await prisma.user.update({
         where: { email: email },
-        data: { profile: { create: profile } },
+        data: { profile: { create: { bio: profile } } },
       });
       return res.status(201).json({ Message: "Perfil criado com sucesso!" });
-    } else {
-      await prisma.user.update({
-        where: { email: email },
-        data: { profile: { update: profile } },
-      });
-      return res.status(201).json({ Message: "Perfil atulizado com sucesso!" });
     }
+    await prisma.user.update({
+      where: { email: email },
+      data: { profile: { update: { bio: profile } } },
+    });
+    return res.status(201).json({ Message: "Perfil atulizado com sucesso!" });
   } catch (error) {
     await prisma.$disconnect();
     console.error(error);
@@ -41,11 +40,11 @@ const createProfile = async (req, res) => {
 };
 
 const updateProfile = async (req, res) => {
-  const idUser = req.params.id;
+  const idUser = parseInt(req.params.id);
   if (!idUser) {
     return res.status(400).json({ Error: "ID fornecido não é válido!" });
   }
-  const idExist = services.checkIdUser(idUser);
+  const idExist = await services.checkIdUser(idUser);
   if (!idExist) {
     return res
       .status(404)
@@ -60,7 +59,7 @@ const updateProfile = async (req, res) => {
   try {
     await prisma.user.update({
       where: { id: idUser },
-      data: { profile: { update: profile } },
+      data: { profile: { update: { bio: profile } } },
     });
     return res.status(201).json({ Message: "Perfil atualizado com sucesso!" });
   } catch (error) {
@@ -71,11 +70,11 @@ const updateProfile = async (req, res) => {
 };
 
 const deleteProfile = async (req, res) => {
-  const idUser = req.params.id;
+  const idUser = parseInt(req.params.id);
   if (!idUser) {
     return res.status(400).json({ Error: "ID fornecido não é válido!" });
   }
-  const idExist = services.checkIdUser(idUser);
+  const idExist = await services.checkIdUser(idUser);
   if (!idExist) {
     return res
       .status(404)
@@ -83,8 +82,8 @@ const deleteProfile = async (req, res) => {
   }
   try {
     await prisma.user.update({
-      where: { email: email },
-      data: { profile: null },
+      where: { id: idUser },
+      data: { profile: { delete: true } },
     });
     return res.status(201).json({ Message: "Perfil excluído com sucesso!" });
   } catch (error) {

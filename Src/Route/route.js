@@ -5,11 +5,11 @@ const profile = require("../Controller/ProfileController");
 const post = require("../Controller/PostController");
 
 // Rotas de controle do Usuário
-route.post("/users", user.createUser);
-route.get("/users", user.readUsers);
-route.get("/users/:id", user.findUserById);
-route.patch("/users/:id", user.updateUser);
-route.delete("/users/:id", user.deleteUser);
+route.post("/user", user.createUser);
+route.get("/user", user.readUsers);
+route.get("/user/:id", user.findUserById);
+route.patch("/user/:id", user.updateUser);
+route.delete("/user/:id", user.deleteUser);
 
 // Rotas de controle de Profile
 route.post("/profile", profile.createProfile);
@@ -22,7 +22,8 @@ route.get("/post", post.readAllPosts);
 route.get("/post/me/:id", post.readPostsByUser);
 route.get("/post/:id", post.findPostById);
 route.patch("/post/:id", post.updatePost);
+route.patch("/post/publish/:id", post.publishPost);
 route.delete("/post/:id", post.deletePost);
-route.delete("/post/all/:id", post.readAllPosts);
+route.delete("/post/all/:id", post.deleteAllPostsByUser);
 
 module.exports = route;

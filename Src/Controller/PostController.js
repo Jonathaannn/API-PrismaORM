@@ -9,7 +9,7 @@ const createPost = async (req, res) => {
       .status(400)
       .json({ Error: "Preencha todos os campos corretamente!" });
   }
-  const emailExist = services.checkEmailUser(email);
+  const emailExist = await services.checkEmailUser(email);
   if (!emailExist) {
     return res
       .status(404)
@@ -40,11 +40,11 @@ const readAllPosts = async (req, res) => {
 };
 
 const readPostsByUser = async (req, res) => {
-  const idAuth = req.params.id;
+  const idAuth = parseInt(parseInt(req.params.id));
   if (!idAuth) {
     return res.status(400).json({ Error: "ID fornecido não é válido" });
   }
-  const IdExist = services.checkIdUser(idAuth);
+  const IdExist = await services.checkIdUser(idAuth);
   if (!IdExist) {
     return res
       .status(404)
@@ -66,11 +66,11 @@ const readPostsByUser = async (req, res) => {
 };
 
 const findPostById = async (req, res) => {
-  const idPost = req.params.id;
+  const idPost = parseInt(req.params.id);
   if (!idPost) {
     return res.status(400).json({ Error: "ID fornecido não é válido!" });
   }
-  const IdExist = services.checkIdUser(idPost);
+  const IdExist = await services.checkIdPost(idPost);
   if (!IdExist) {
     return res
       .status(404)
@@ -92,11 +92,11 @@ const findPostById = async (req, res) => {
 };
 
 const updatePost = async (req, res) => {
-  const idPost = req.params.id;
+  const idPost = parseInt(req.params.id);
   if (!idPost) {
     return res.status(400).json({ Error: "ID fornecido não é válido!" });
   }
-  const IdExist = services.checkIdUser(idPost);
+  const IdExist = await services.checkIdPost(idPost);
   if (!IdExist) {
     return res
       .status(404)
@@ -121,12 +121,36 @@ const updatePost = async (req, res) => {
   }
 };
 
-const deletePost = async (req, res) => {
-  const idPost = req.params.id;
+const publishPost = async (req, res) => {
+  const idPost = parseInt(req.params.id);
   if (!idPost) {
     return res.status(400).json({ Error: "ID fornecido não é válido!" });
   }
-  const IdExist = services.checkIdUser(idPost);
+  const IdExist = await services.checkIdPost(idPost);
+  if (!IdExist) {
+    return res
+      .status(404)
+      .json({ Warning: "ID fornecido não pertence a nenhum Post!" });
+  }
+  try {
+    await prisma.post.update({
+      where: { id: idPost },
+      data: { published: true },
+    });
+    return res.status(201).json({ Message: "Post foi publicado com sucesso!" });
+  } catch (error) {
+    await prisma.$disconnect();
+    console.error(error);
+    res.status(500).json({ Error: "Erro interno no servidor!" });
+  }
+};
+
+const deletePost = async (req, res) => {
+  const idPost = parseInt(req.params.id);
+  if (!idPost) {
+    return res.status(400).json({ Error: "ID fornecido não é válido!" });
+  }
+  const IdExist = await services.checkIdPost(idPost);
   if (!IdExist) {
     return res
       .status(404)
@@ -143,11 +167,11 @@ const deletePost = async (req, res) => {
 };
 
 const deleteAllPostsByUser = async (req, res) => {
-  const idAuth = req.params.id;
+  const idAuth = parseInt(req.params.id);
   if (!idAuth) {
     return res.status(400).json({ Error: "ID fornecido não é válido!" });
   }
-  const IdExist = services.checkIdUser(idAuth);
+  const IdExist = await services.checkIdUser(idAuth);
   if (!IdExist) {
     return res
       .status(404)
@@ -156,7 +180,7 @@ const deleteAllPostsByUser = async (req, res) => {
   try {
     await prisma.post.deleteMany({ where: { authorId: idAuth } });
     return res.status(201).json({
-      Message: "Todos os Posts dos Usuário foram excluídos com sucesso!",
+      Message: "Todos os Posts do Usuário foram excluídos com sucesso!",
     });
   } catch (error) {
     await prisma.$disconnect();
@@ -171,6 +195,7 @@ module.exports = {
   readPostsByUser,
   findPostById,
   updatePost,
+  publishPost,
   deletePost,
   deleteAllPostsByUser,
 };

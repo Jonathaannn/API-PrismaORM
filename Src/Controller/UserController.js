@@ -9,8 +9,8 @@ const createUser = async (req, res) => {
       .status(400)
       .json({ Error: "Preencha todos os campos corretamente!" });
   }
-  const emailExist = services.checkEmailUser(email);
-  if (emailExist) {
+  const emailExist = await services.checkEmailUser(email);
+  if (!emailExist) {
     return res.status(400).json({ Warning: "Email já foi cadastrado!" });
   }
   try {
@@ -37,11 +37,11 @@ const readUsers = async (req, res) => {
 };
 
 const findUserById = async (req, res) => {
-  const idUser = req.params.id;
+  const idUser = parseInt(parseInt(req.params.id));
   if (!idUser) {
     return res.status(400).json({ Error: "ID fornecido não é válido!" });
   }
-  const idExist = services.checkIdUser(idUser);
+  const idExist = await services.checkIdUser(idUser);
   if (!idExist) {
     return res
       .status(404)
@@ -67,11 +67,11 @@ const updateUser = async (req, res) => {
       .status(400)
       .json({ Error: "Preencha todos os campos corretamente!" });
   }
-  const idUser = req.params.id;
+  const idUser = parseInt(req.params.id);
   if (!idUser) {
     return res.status(400).json({ Error: "ID fornecido não é válido!" });
   }
-  const idExist = services.checkIdUser(idUser);
+  const idExist = await services.checkIdUser(idUser);
   if (!idExist) {
     return res
       .status(404)
@@ -91,11 +91,11 @@ const updateUser = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
-  const idUser = req.params.id;
+  const idUser = parseInt(req.params.id);
   if (!idUser) {
     return res.status(400).json({ Error: "ID fornecido não é válido!" });
   }
-  const idExist = services.checkIdUser(idUser);
+  const idExist = await services.checkIdUser(idUser);
   if (!idExist) {
     return res
       .status(404)
